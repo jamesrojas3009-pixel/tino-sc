@@ -11,10 +11,10 @@ export interface BeaconTheme {
 }
 
 export const BEACON_THEMES: BeaconTheme[] = [
-  { id: 'stars', image: '/images/backgrounds/stars.jpg', desktop: 'tile', scrim: 0 },
-  { id: 'checker', image: '/images/backgrounds/checker.jpg', desktop: 'cover', scrim: 0.35 },
-  { id: 'blueprint', image: '/images/backgrounds/blueprint.jpg', desktop: 'cover', scrim: 0.2 },
-  { id: 'math', image: '/images/backgrounds/math.jpg', desktop: 'cover', scrim: 0.15 },
+  { id: 'stars', image: '/images/backgrounds/stars.webp', desktop: 'tile', scrim: 0 },
+  { id: 'checker', image: '/images/backgrounds/checker.webp', desktop: 'cover', scrim: 0.35 },
+  { id: 'blueprint', image: '/images/backgrounds/blueprint.webp', desktop: 'cover', scrim: 0.2 },
+  { id: 'math', image: '/images/backgrounds/math.webp', desktop: 'cover', scrim: 0.15 },
 ];
 
 export type BeaconIcon = 'cv' | 'whatsapp' | 'upwork' | 'mail' | 'phone';
@@ -178,11 +178,11 @@ export const beaconLinks: BeaconLink[] = [
     href: 'https://kyro-restaurant.vercel.app/',
     external: true,
     logos: [
-      '/images/brands/lomas-grill.png',
-      '/images/brands/paradero-104.png',
-      '/images/brands/don-jacinto.png',
+      '/images/brands/lomas-grill.webp',
+      '/images/brands/paradero-104.webp',
+      '/images/brands/don-jacinto.webp',
     ],
-    image: '/images/projects/restaurants.jpg',
+    image: '/images/projects/restaurants.webp',
     title: { es: 'Kyro · Sistema para restaurantes', en: 'Kyro · Restaurant system' },
     subtitle: {
       es: 'Las Lomas Grill · Paradero 104 · Don Jacinto',
@@ -194,8 +194,8 @@ export const beaconLinks: BeaconLink[] = [
     group: 'projects',
     href: 'https://obsidiana-market.vercel.app',
     external: true,
-    logos: ['/images/brands/obsidiana.jpg'],
-    image: '/images/projects/obsidiana.jpg',
+    logos: ['/images/brands/obsidiana.webp'],
+    image: '/images/projects/obsidiana.webp',
     title: { es: 'Obsidiana Joyería', en: 'Obsidiana Joyería' },
     subtitle: { es: 'Catálogo online en plata 925 y 950', en: 'Online catalog in 925 and 950 silver' },
   },
@@ -204,8 +204,8 @@ export const beaconLinks: BeaconLink[] = [
     group: 'projects',
     href: 'https://reservas-sentinel.vercel.app/',
     external: true,
-    logos: ['/images/brands/sentinel-core.png'],
-    image: '/images/projects/overshark.jpg',
+    logos: ['/images/brands/sentinel-core.webp'],
+    image: '/images/projects/overshark.webp',
     title: { es: 'Sentinel Core · Reservas e inventario', en: 'Sentinel Core · Reservations & inventory' },
     subtitle: { es: 'Reservas de prendas con códigos QR', en: 'Garment reservations with QR codes' },
   },
@@ -225,7 +225,7 @@ export interface BeaconCompany {
 export const beaconCompanies: BeaconCompany[] = [
   {
     name: 'Overshark Perú S.A.C.',
-    logo: '/images/companies/overshark.jpg',
+    logo: '/images/companies/overshark.webp',
     tile: '#ffffff',
     role: {
       es: 'Validador · Analista de datos · Soporte operativo',
@@ -236,7 +236,7 @@ export const beaconCompanies: BeaconCompany[] = [
   },
   {
     name: 'Zazu Express',
-    logo: '/images/companies/zazu-express.jpg',
+    logo: '/images/companies/zazu-express.webp',
     tile: '#5c0099',
     role: { es: 'Asistente de operaciones y envíos', en: 'Operations & shipping assistant' },
     period: { es: 'Jun. – Ago. 2025', en: 'Jun – Aug 2025' },
@@ -244,7 +244,7 @@ export const beaconCompanies: BeaconCompany[] = [
   },
   {
     name: 'I.C. Logística S.A.C.',
-    logo: '/images/companies/anc-logistica.jpg',
+    logo: '/images/companies/anc-logistica.webp',
     tile: '#ffffff',
     role: { es: 'Operario de almacén y despacho', en: 'Warehouse & dispatch operator' },
     period: { es: 'Abr. – Ago. 2025', en: 'Apr – Aug 2025' },
@@ -252,26 +252,31 @@ export const beaconCompanies: BeaconCompany[] = [
   },
 ];
 
-// Technologies from the CV. `slug` is the file name in public/images/tech/ (official brand glyphs).
-export const beaconTech: { slug: string; name: string }[] = [
-  { slug: 'react', name: 'React' },
-  { slug: 'nextdotjs', name: 'Next.js' },
-  { slug: 'javascript', name: 'JavaScript' },
-  { slug: 'typescript', name: 'TypeScript' },
-  { slug: 'html5', name: 'HTML5' },
-  { slug: 'css3', name: 'CSS3' },
-  { slug: 'tailwindcss', name: 'Tailwind CSS' },
-  { slug: 'nodedotjs', name: 'Node.js' },
-  { slug: 'supabase', name: 'Supabase' },
-  { slug: 'postgresql', name: 'SQL' },
-  { slug: 'powerbi', name: 'Power BI' },
-  { slug: 'microsoftexcel', name: 'Excel' },
-  { slug: 'docker', name: 'Docker' },
-  { slug: 'git', name: 'Git' },
-  { slug: 'vercel', name: 'Vercel' },
-  { slug: 'visualstudiocode', name: 'VS Code' },
-  { slug: 'postman', name: 'Postman' },
+// Technologies from the CV. `slug` is the file name in public/images/tech/ (official brand glyphs),
+// `color` is the brand color used for the glow under each icon.
+export const beaconTech: { slug: string; name: string; color: string }[] = [
+  { slug: 'react', name: 'React', color: '#61DAFB' },
+  { slug: 'nextdotjs', name: 'Next.js', color: '#FFFFFF' },
+  { slug: 'javascript', name: 'JavaScript', color: '#F7DF1E' },
+  { slug: 'typescript', name: 'TypeScript', color: '#3178C6' },
+  { slug: 'html5', name: 'HTML5', color: '#E34F26' },
+  { slug: 'css3', name: 'CSS3', color: '#1572B6' },
+  { slug: 'tailwindcss', name: 'Tailwind CSS', color: '#06B6D4' },
+  { slug: 'nodedotjs', name: 'Node.js', color: '#5FA04E' },
+  { slug: 'supabase', name: 'Supabase', color: '#3FCF8E' },
+  { slug: 'postgresql', name: 'SQL', color: '#4169E1' },
+  { slug: 'powerbi', name: 'Power BI', color: '#F2C811' },
+  { slug: 'microsoftexcel', name: 'Excel', color: '#217346' },
+  { slug: 'docker', name: 'Docker', color: '#2496ED' },
+  { slug: 'git', name: 'Git', color: '#F05032' },
+  { slug: 'vercel', name: 'Vercel', color: '#FFFFFF' },
+  { slug: 'visualstudiocode', name: 'VS Code', color: '#007ACC' },
+  { slug: 'postman', name: 'Postman', color: '#FF6C37' },
 ];
 
-// Icons per row, so the grid zig-zags (4, 3, 4, 3, 3 = 17)
-export const TECH_ROW_PATTERN = [4, 3, 4, 3, 3];
+// Icons per row, so the grid zig-zags without leaving a lone icon on the last row (both add up to 17).
+// `compact` is for phones, `wide` for tablets and desktops.
+export const TECH_ROW_PATTERNS = {
+  compact: [4, 3, 4, 3, 3],
+  wide: [6, 5, 6],
+};

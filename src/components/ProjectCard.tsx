@@ -1,31 +1,30 @@
 import React from 'react';
-import { motion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
 import { Language } from '../data/profile';
 import { BeaconLink } from '../data/beacon';
-import { glass } from './theme';
+import { glass, riseDelay } from './theme';
 
 // Brand logos that are a full-bleed square on a dark background: crop them to the circle instead of letterboxing
-const COVER_LOGOS = ['/images/brands/obsidiana.jpg'];
+const COVER_LOGOS = ['/images/brands/obsidiana.webp'];
 
 // Project card: wide screenshot on top, uniform round brand logos over it, title below
 export const ProjectCard: React.FC<{ link: BeaconLink; lang: Language; index: number }> = ({ link, lang, index }) => (
-  <motion.a
+  <a
     href={link.href}
     target="_blank"
     rel="noopener noreferrer"
-    initial={{ opacity: 0, y: 14 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.4, delay: 0.05 + index * 0.06 }}
-    whileHover={{ y: -3 }}
-    className={`group block overflow-hidden rounded-3xl text-white transition-colors hover:bg-black/70 ${glass}`}
+    style={riseDelay(0.05 + index * 0.06)}
+    className={`rise group block overflow-hidden rounded-3xl text-white transition-[transform,background-color] duration-200 hover:-translate-y-[3px] hover:bg-black/70 ${glass}`}
   >
     <div className="relative aspect-[16/9] overflow-hidden bg-black/40">
       {link.image && (
         <img
           src={link.image}
           alt=""
+          width={960}
+          height={540}
           loading="lazy"
+          decoding="async"
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
       )}
@@ -37,7 +36,10 @@ export const ProjectCard: React.FC<{ link: BeaconLink; lang: Language; index: nu
             <img
               src={logo}
               alt=""
+              width={40}
+              height={40}
               loading="lazy"
+              decoding="async"
               className={`h-10 w-10 ${COVER_LOGOS.includes(logo) ? 'object-cover' : 'object-contain p-1'}`}
             />
           </span>
@@ -53,5 +55,5 @@ export const ProjectCard: React.FC<{ link: BeaconLink; lang: Language; index: nu
       <h3 className="font-display text-[15px] font-bold leading-snug">{link.title[lang]}</h3>
       <p className="mt-0.5 text-xs leading-snug text-white/65">{link.subtitle[lang]}</p>
     </div>
-  </motion.a>
+  </a>
 );

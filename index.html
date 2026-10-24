@@ -2,7 +2,7 @@
 <html lang="es" class="dark scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>tino-sc</title>
     <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
     <link rel="icon" type="image/png" sizes="128x128" href="/favicon.png" />
@@ -31,13 +31,9 @@
       name="twitter:description"
       content="Turning Business Processes into Smart Web Apps & Dashboards. Portfolio of James Valentino Rojas Díaz (Tino)."
     />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <script type="application/ld+json">
+    <!-- Fonts are self-hosted; preloading them lets them download in parallel with the CSS and JS -->
+    <link rel="preload" href="/fonts/outfit.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/plus-jakarta-sans.woff2" as="font" type="font/woff2" crossorigin />    <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "Person",
@@ -81,7 +77,27 @@
     </script>
   </head>
   <body class="bg-[#090D16] text-slate-100 antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
-    <div id="root"></div>
+    <div id="root">
+      <!-- Shown until the app mounts, so the first paint doesn't wait for the JavaScript download.
+           Same position as the real header, so nothing jumps when React takes over. -->
+      <main id="splash" class="mx-auto flex w-full max-w-[34rem] flex-col items-center px-4 pt-[5.75rem] text-center text-white md:hidden">
+        <img
+          src="/images/profile.webp"
+          alt=""
+          width="112"
+          height="112"
+          fetchpriority="high"
+          class="h-28 w-28 rounded-full border-4 border-[#0d0d0d] object-cover object-[50%_30%] ring-2 ring-white/50"
+        />
+        <h1 class="mt-5 font-display text-2xl font-bold tracking-tight">
+          James Valentino Rojas Díaz <span class="font-light text-white/70">(Tino)</span>
+        </h1>
+      </main>
+    </div>
+    <script>
+      // Deep links (/beacon#projects) don't open on the home screen, so skip the splash for them
+      if (location.hash) document.getElementById('splash').hidden = true;
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

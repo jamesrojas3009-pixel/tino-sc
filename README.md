@@ -29,18 +29,25 @@ src/
     profile.ts          correo, teléfonos, Upwork, rutas del CV y la foto
     beacon.ts           textos ES/EN, enlaces, proyectos, empresas y tecnologías
     experience.ts       cargos del CV (detalle de los desplegables)
-  utils/                enlaces de WhatsApp y de correo (+ pruebas)
+  utils/                enlaces de WhatsApp y de correo (+ pruebas), detector de tamaño de pantalla
 public/
   cv-james-rojas.pdf    CV descargable
   favicon*.png, apple-touch-icon.png
-  images/
-    profile.jpg         foto de perfil
+  fonts/                Outfit y Plus Jakarta Sans (alojadas aquí, no en Google)
+  images/               todo en WebP, ya reducido al tamaño en que se muestra
+    profile.webp        foto de perfil
     backgrounds/        fondos de las pantallas
     projects/           capturas de los proyectos
     brands/             logos de los clientes
     companies/          logos de las empresas donde trabajó
     tech/               iconos de tecnologías (Simple Icons)
 ```
+
+## Diseño y rendimiento
+
+- **Responsive:** una columna en celular, columna más ancha en tablet (contacto en 2 columnas, proyectos en 3 tarjetas) y dos columnas en escritorio (perfil y contacto a la izquierda, resumen a la derecha).
+- **Carga rápida:** una portada mínima en `index.html` se pinta antes de que llegue el JavaScript, solo se descarga el fondo visible (los demás cuando la página ya cargó) y las animaciones son CSS.
+- **Imágenes nuevas:** conviértelas a WebP y al tamaño en que se muestran (los logos ~190 px, las capturas ~960 px de ancho, la foto ~320 px) antes de ponerlas en `public/images/`.
 
 ## Qué editar
 

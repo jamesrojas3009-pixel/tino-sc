@@ -12,6 +12,6 @@ export const PROFILE = {
   phoneTel: '+51939603467',
   upwork: 'https://www.upwork.com/freelancers/tinosc',
   upworkDisplay: 'upwork.com/freelancers/tinosc',
-  portraitImage: '/images/profile.jpg',
+  portraitImage: '/images/profile.webp',
   cvPdf: '/cv-james-rojas.pdf',
 };
