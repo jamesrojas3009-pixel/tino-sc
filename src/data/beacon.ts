@@ -1,4 +1,4 @@
-import { Language, PROFILE } from './profile';
+import { Language } from './profile';
 
 // Backgrounds of the Beacon screens (files live in public/images/backgrounds/); each screen takes the next one.
 // `tile` repeats the (portrait) image on wide screens; `cover` stretches it.
@@ -17,20 +17,13 @@ export const BEACON_THEMES: BeaconTheme[] = [
   { id: 'math', image: '/images/backgrounds/math.webp', desktop: 'cover', scrim: 0.15 },
 ];
 
-export type BeaconIcon = 'cv' | 'whatsapp' | 'upwork' | 'mail' | 'phone';
-
 type Localized = Record<Language, string>;
 
-export interface BeaconLink {
+export interface BeaconProject {
   id: string;
-  group: 'main' | 'projects';
   href: string;
-  external?: boolean;
-  download?: boolean;
-  featured?: boolean;
-  icon?: BeaconIcon;
-  logos?: string[];
-  image?: string; // banner shown on project cards
+  logos: string[];
+  image: string; // banner shown on the card
   title: Localized;
   subtitle: Localized;
 }
@@ -43,15 +36,21 @@ export const beaconCopy: Record<
     bio: string;
     location: string;
     availability: string;
-    tabs: { home: string; links: string; projects: string; experience: string; stack: string };
+    tabs: { home: string; projects: string; experience: string; stack: string };
     home: {
       summaryTitle: string;
-      contactTitle: string;
       summary: string[];
       stats: { value: string; label: string }[];
       more: string;
     };
-    contact: { email: string; calls: string; whatsappBusiness: string; whatsappPersonal: string };
+    contact: {
+      whatsapp: string;
+      copy: string;
+      copied: string;
+      call: string;
+      whatsappPersonal: string;
+      cv: string;
+    };
     next: string;
     backHome: string;
     share: string;
@@ -63,20 +62,18 @@ export const beaconCopy: Record<
 > = {
   es: {
     title: 'tino-sc',
-    tagline: 'Estudiante de Ing. de Software · Desarrollador Web Junior',
+    tagline: 'Estudiante de Ing. de Software · Desarrollador Web Junior', // no-break space keeps "·" off the start of a line
     bio: 'Convierto procesos de negocio en aplicaciones web y dashboards inteligentes.',
     location: 'Lima, Perú',
     availability: 'Disponibilidad inmediata',
     tabs: {
       home: 'Inicio',
-      links: 'Enlaces',
       projects: 'Proyectos',
       experience: 'Experiencia',
       stack: 'Stack',
     },
     home: {
       summaryTitle: 'Resumen',
-      contactTitle: 'Contacto',
       summary: [
         'Estudiante de Ingeniería de Software y desarrollador web junior.',
         'Tres aplicaciones web reales para negocios de moda, gastronomía y joyería: reservas e inventario con códigos QR, sitio de restaurantes y catálogo online.',
@@ -91,10 +88,12 @@ export const beaconCopy: Record<
       more: 'Ver más',
     },
     contact: {
-      email: 'Correo',
-      calls: 'Llamadas',
-      whatsappBusiness: 'WhatsApp · negocios',
-      whatsappPersonal: 'WhatsApp · personal',
+      whatsapp: 'Escríbeme por WhatsApp',
+      copy: 'Copiar',
+      copied: 'Copiado',
+      call: 'Llamar',
+      whatsappPersonal: 'Personal',
+      cv: 'CV',
     },
     next: 'Siguiente',
     backHome: 'Volver al inicio',
@@ -106,20 +105,18 @@ export const beaconCopy: Record<
   },
   en: {
     title: 'tino-sc',
-    tagline: 'Software Engineering Student · Junior Web Developer',
+    tagline: 'Software Engineering Student · Junior Web Developer',
     bio: 'I turn business processes into smart web apps and dashboards.',
     location: 'Lima, Peru',
     availability: 'Available immediately',
     tabs: {
       home: 'Home',
-      links: 'Links',
       projects: 'Projects',
       experience: 'Experience',
       stack: 'Stack',
     },
     home: {
       summaryTitle: 'Summary',
-      contactTitle: 'Contact',
       summary: [
         'Software Engineering student and junior web developer.',
         'Three real web applications for fashion, food service and jewelry businesses: reservations and inventory with QR codes, a restaurant website and an online catalog.',
@@ -134,10 +131,12 @@ export const beaconCopy: Record<
       more: 'See more',
     },
     contact: {
-      email: 'Email',
-      calls: 'Calls',
-      whatsappBusiness: 'WhatsApp · business',
-      whatsappPersonal: 'WhatsApp · personal',
+      whatsapp: 'Message me on WhatsApp',
+      copy: 'Copy',
+      copied: 'Copied',
+      call: 'Call',
+      whatsappPersonal: 'Personal',
+      cv: 'CV',
     },
     next: 'Next',
     backHome: 'Back to start',
@@ -149,34 +148,10 @@ export const beaconCopy: Record<
   },
 };
 
-export const beaconLinks: BeaconLink[] = [
-  {
-    id: 'cv',
-    group: 'main',
-    href: PROFILE.cvPdf,
-    download: true,
-    featured: true,
-    icon: 'cv',
-    title: { es: 'Descargar mi CV', en: 'Download my CV' },
-    subtitle: { es: 'PDF · versión en español', en: 'PDF · Spanish version' },
-  },
-  {
-    id: 'whatsapp',
-    group: 'main',
-    href: '', // built at render time (needs the pre-filled message for the active language)
-    external: true,
-    icon: 'whatsapp',
-    title: { es: 'Escríbeme por WhatsApp', en: 'Message me on WhatsApp' },
-    subtitle: {
-      es: `WhatsApp de negocios · ${PROFILE.whatsappDisplay}`,
-      en: `Business WhatsApp · ${PROFILE.whatsappDisplay}`,
-    },
-  },
+export const beaconProjects: BeaconProject[] = [
   {
     id: 'kyro',
-    group: 'projects',
     href: 'https://kyro-restaurant.vercel.app/',
-    external: true,
     logos: [
       '/images/brands/lomas-grill.webp',
       '/images/brands/paradero-104.webp',
@@ -191,9 +166,7 @@ export const beaconLinks: BeaconLink[] = [
   },
   {
     id: 'obsidiana',
-    group: 'projects',
     href: 'https://obsidiana-market.vercel.app',
-    external: true,
     logos: ['/images/brands/obsidiana.webp'],
     image: '/images/projects/obsidiana.webp',
     title: { es: 'Obsidiana Joyería', en: 'Obsidiana Joyería' },
@@ -201,9 +174,7 @@ export const beaconLinks: BeaconLink[] = [
   },
   {
     id: 'sentinel',
-    group: 'projects',
     href: 'https://reservas-sentinel.vercel.app/',
-    external: true,
     logos: ['/images/brands/sentinel-core.webp'],
     image: '/images/projects/overshark.webp',
     title: { es: 'Sentinel Core · Reservas e inventario', en: 'Sentinel Core · Reservations & inventory' },

@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { Check, MapPin, Share2 } from 'lucide-react';
+import { Check, Share2 } from 'lucide-react';
 import { Language, PROFILE } from '../data/profile';
-import { BEACON_THEMES, BeaconLink, beaconCompanies, beaconCopy, beaconLinks } from '../data/beacon';
+import { BEACON_THEMES, beaconCompanies, beaconCopy, beaconProjects } from '../data/beacon';
 import { buildWhatsAppUrl } from '../utils/contact';
+import { useMediaQuery } from '../utils/useMediaQuery';
 import { CompanyAccordion } from './CompanyAccordion';
-import { ContactRow, ContactRowData } from './ContactRow';
-import { LinkCard } from './LinkCard';
+import { ContactActions } from './ContactActions';
 import { PillButton } from './PillButton';
 import { ProjectCard } from './ProjectCard';
 import { SectionLabel } from './SectionLabel';
 import { TechRows } from './TechRows';
 import { glass } from './theme';
 
-// Screens, in order. Each one gets the next background image (they cycle), and is linkable as /beacon#<id>
-const TAB_IDS = ['home', 'links', 'projects', 'experience', 'stack'] as const;
+// Screens, in order. Each one gets its own background image, and is linkable as /beacon#<id>
+const TAB_IDS = ['home', 'projects', 'experience', 'stack'] as const;
 type TabId = (typeof TAB_IDS)[number];
 
 const getInitialTab = (): TabId => {
@@ -32,6 +32,8 @@ export const BeaconPage: React.FC = () => {
   const [openCompanies, setOpenCompanies] = useState<string[]>([beaconCompanies[0].name]);
   const toggleCompany = (name: string) =>
     setOpenCompanies((open) => (open.includes(name) ? open.filter((n) => n !== name) : [...open, name]));
+  // Tablets and desktops get the section tabs in the top bar on every screen; phones keep the step-by-step flow
+  const wide = useMediaQuery('(min-width: 768px)');
   const copy = beaconCopy[lang];
 
   const tabIdx = TAB_IDS.indexOf(tab);
@@ -77,7 +79,6 @@ export const BeaconPage: React.FC = () => {
 
   const whatsappUrl = buildWhatsAppUrl(copy.whatsappMessage, PROFILE.whatsappPhone);
   const whatsappPersonalUrl = buildWhatsAppUrl(copy.whatsappMessage, PROFILE.whatsappPersonalPhone);
-  const hrefFor = (link: BeaconLink) => (link.id === 'whatsapp' ? whatsappUrl : link.href);
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -94,16 +95,36 @@ export const BeaconPage: React.FC = () => {
     }
   };
 
-  const contactRows: ContactRowData[] = [
-    { id: 'email', icon: 'mail', label: copy.contact.email, value: PROFILE.email, href: `mailto:${PROFILE.email}` },
-    { id: 'calls', icon: 'phone', label: copy.contact.calls, value: PROFILE.phoneDisplay, href: `tel:${PROFILE.phoneTel}` },
-    { id: 'wa-business', icon: 'whatsapp', label: copy.contact.whatsappBusiness, value: PROFILE.whatsappDisplay, href: whatsappUrl, external: true },
-    { id: 'wa-personal', icon: 'whatsapp', label: copy.contact.whatsappPersonal, value: PROFILE.whatsappPersonalDisplay, href: whatsappPersonalUrl, external: true },
-    { id: 'upwork', icon: 'upwork', label: 'Upwork', value: PROFILE.upworkDisplay, href: PROFILE.upwork, external: true },
-  ];
-
-  const mainLinks = beaconLinks.filter((l) => l.group === 'main');
-  const projectLinks = beaconLinks.filter((l) => l.group === 'projects');
+  const tabBar = (
+    <div
+      role="tablist"
+      aria-label="Secciones"
+      className={`inline-flex max-w-full gap-0.5 overflow-x-auto rounded-full p-1 [scrollbar-width:none] ${glass}`}
+    >
+      {TAB_IDS.map((id) => {
+        const active = tab === id;
+        return (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            id={`tab-${id}`}
+            aria-selected={active}
+            aria-controls={`panel-${id}`}
+            onClick={(e) => {
+              selectTab(id);
+              e.currentTarget.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+            }}
+            className={`min-h-10 shrink-0 rounded-full px-3 text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer max-[360px]:px-2 md:px-5 md:text-sm ${
+              active ? 'bg-white text-slate-950' : 'text-white/70 hover:text-white'
+            }`}
+          >
+            {copy.tabs[id]}
+          </button>
+        );
+      })}
+    </div>
+  );
 
   return (
     <div className="relative min-h-dvh overflow-x-hidden text-white">
@@ -123,23 +144,25 @@ export const BeaconPage: React.FC = () => {
         ))}
 
         <div className="absolute inset-0 bg-black transition-opacity duration-700" style={{ opacity: theme.scrim }} />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/45 to-black/75" />
-        {/* Extra dark veil behind the content so text stays readable on wide screens; it grows with the layout */}
-        <div className="absolute inset-y-0 left-1/2 hidden w-[52rem] -translate-x-1/2 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.65)_0%,rgba(0,0,0,0.45)_55%,transparent_75%)] md:block lg:w-[80rem]" />
+        {/* Darker on big screens, where the busy backgrounds fill much more space around the text */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/45 to-black/75 md:from-black/65 md:via-black/60 md:to-black/80" />
       </div>
 
       {/* One column on phones, a wider centered column on tablets and a two-column layout on desktops */}
-      <main className="mx-auto flex w-full max-w-[34rem] flex-col px-4 pb-[max(3.5rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))] sm:px-6 md:max-w-3xl md:pt-10 lg:max-w-6xl lg:px-10">
-        {/* Top bar */}
-        <div className="flex items-center justify-between">
+      <main className="mx-auto flex w-full max-w-[34rem] flex-col px-4 pb-[max(3.5rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))] sm:px-6 md:max-w-3xl md:pt-8 lg:max-w-6xl lg:px-10">
+        {/* Top bar; on tablets and desktops it also holds the section tabs and stays pinned while scrolling */}
+        <div className="flex items-center justify-between gap-3 md:sticky md:top-4 md:z-30">
           <button
             type="button"
             onClick={handleShare}
-            className={`inline-flex min-h-10 items-center gap-2 rounded-full px-3.5 text-xs font-semibold text-white transition-colors hover:bg-white/20 cursor-pointer md:px-5 md:text-sm ${glass}`}
+            aria-label={copy.share}
+            className={`inline-flex min-h-10 items-center gap-2 rounded-full px-3.5 text-xs font-semibold text-white transition-colors hover:bg-white/20 cursor-pointer md:text-sm lg:px-5 ${glass}`}
           >
-            {copied ? <Check className="h-3.5 w-3.5 text-emerald-300" /> : <Share2 className="h-3.5 w-3.5" />}
-            {copied ? copy.copied : copy.share}
+            {copied ? <Check className="h-4 w-4 text-emerald-300" /> : <Share2 className="h-4 w-4" />}
+            <span className={wide ? 'hidden lg:inline' : ''}>{copied ? copy.copied : copy.share}</span>
           </button>
+
+          {wide && tabBar}
 
           <div role="group" aria-label={copy.langAria} className={`inline-flex items-center rounded-full p-1 ${glass}`}>
             {(['es', 'en'] as const).map((code) => (
@@ -148,7 +171,7 @@ export const BeaconPage: React.FC = () => {
                 type="button"
                 onClick={() => setLang(code)}
                 aria-pressed={lang === code}
-                className={`min-h-8 rounded-full px-3 text-xs font-bold uppercase transition-colors cursor-pointer md:min-h-9 md:px-4 md:text-sm ${
+                className={`min-h-8 rounded-full px-3 text-xs font-bold uppercase transition-colors cursor-pointer md:min-h-9 md:px-3.5 md:text-sm ${
                   lang === code ? 'bg-white text-slate-950' : 'text-white/70 hover:text-white'
                 }`}
               >
@@ -160,10 +183,10 @@ export const BeaconPage: React.FC = () => {
 
         <div key={tab} className="rise">
           {tab === 'home' ? (
-            <div className="lg:grid lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:items-start lg:gap-14">
+            <div className="lg:mx-auto lg:grid lg:max-w-5xl lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] lg:items-center lg:gap-16 lg:pt-6">
               {/* Main screen, left: who I am and how to reach me */}
               <div>
-                <header className="mt-8 flex flex-col items-center text-center [text-shadow:0_1px_12px_rgba(0,0,0,0.95)] lg:mt-12">
+                <header className="mt-8 flex flex-col items-center text-center [text-shadow:0_1px_12px_rgba(0,0,0,0.95)] md:mt-12">
                   <div className="relative">
                     <span
                       aria-hidden="true"
@@ -176,45 +199,38 @@ export const BeaconPage: React.FC = () => {
                       height={112}
                       fetchPriority="high"
                       decoding="async"
-                      className="relative h-28 w-28 rounded-full border-4 border-[#0d0d0d] object-cover object-[50%_30%] md:h-36 md:w-36"
+                      className="relative h-28 w-28 rounded-full border-4 border-[#0d0d0d] object-cover object-[50%_30%] md:h-32 md:w-32"
                     />
                   </div>
 
-                  <h1 className="mt-5 font-display text-2xl font-bold tracking-tight md:mt-6 md:text-3xl">
+                  <h1 className="mt-5 font-display text-2xl font-bold tracking-tight text-balance md:text-3xl">
                     James Valentino Rojas Díaz
                     <span className="ml-1.5 font-light text-white/70">(Tino)</span>
                   </h1>
-                  <p className="mt-1.5 text-sm font-medium text-white/85 md:text-base">{copy.tagline}</p>
-                  <p className="mt-3 max-w-sm text-sm leading-relaxed text-white/90 md:max-w-md md:text-base">{copy.bio}</p>
+                  <p className="mt-1.5 text-sm font-medium text-white/85 text-balance md:text-base">{copy.tagline}</p>
+                  <p className="mt-3 max-w-sm text-sm leading-relaxed text-white/90 text-balance md:text-base">{copy.bio}</p>
 
-                  <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs md:mt-5 md:text-sm">
-                    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-white/85 ${glass}`}>
-                      <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
-                      {copy.location}
+                  <p className="mt-4 inline-flex items-center gap-2 text-xs text-white/75 md:text-sm">
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
                     </span>
-                    <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 font-medium text-emerald-200 backdrop-blur-md">
-                      <span className="relative flex h-2 w-2">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-                        <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                      </span>
-                      {copy.availability}
-                    </span>
-                  </div>
+                    {copy.location} · <span className="text-emerald-200">{copy.availability}</span>
+                  </p>
                 </header>
 
-                <SectionLabel>{copy.home.contactTitle}</SectionLabel>
-                <div className="flex flex-col gap-2.5 md:grid md:grid-cols-2 md:gap-3 lg:flex lg:flex-col">
-                  {contactRows.map((row, idx) => (
-                    <ContactRow key={row.id} row={row} index={idx} />
-                  ))}
-                </div>
+                <ContactActions
+                  copy={copy.contact}
+                  whatsappUrl={whatsappUrl}
+                  whatsappPersonalUrl={whatsappPersonalUrl}
+                />
               </div>
 
-              {/* Main screen, right: summary and the button that opens the other screens */}
+              {/* Main screen, right: summary */}
               <div>
-                <SectionLabel className="mt-8 lg:mt-14">{copy.home.summaryTitle}</SectionLabel>
+                <SectionLabel className="mt-10 lg:mt-0">{copy.home.summaryTitle}</SectionLabel>
                 <div className={`rounded-3xl p-5 md:p-7 ${glass}`}>
-                  <ul className="space-y-2.5 text-sm leading-relaxed text-white/90 md:space-y-3.5 md:text-base">
+                  <ul className="space-y-2.5 text-sm leading-relaxed text-white/90 md:space-y-3 md:text-[15px]">
                     {copy.home.summary.map((line) => (
                       <li key={line} className="flex gap-2.5 md:gap-3">
                         <Check className="mt-1 h-4 w-4 shrink-0 text-emerald-300" aria-hidden="true" />
@@ -222,26 +238,23 @@ export const BeaconPage: React.FC = () => {
                       </li>
                     ))}
                   </ul>
-                  <div className="mt-5 grid grid-cols-3 gap-2 md:mt-7 md:gap-4">
+                  <div className="mt-6 grid grid-cols-3 border-t border-white/10 pt-5 md:mt-7 md:pt-6">
                     {copy.home.stats.map((stat) => (
-                      <div
-                        key={stat.label}
-                        className="rounded-2xl border border-white/15 bg-white/5 px-2 py-3 text-center md:py-5"
-                      >
+                      <div key={stat.label} className="px-1 text-center">
                         <div className="font-display text-xl font-bold md:text-3xl">{stat.value}</div>
-                        <div className="mt-0.5 text-[11px] leading-tight text-white/65 md:mt-1 md:text-sm">{stat.label}</div>
+                        <div className="mt-0.5 text-[11px] leading-tight text-white/60 md:mt-1 md:text-sm">{stat.label}</div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <PillButton onClick={() => selectTab('links')}>{copy.home.more}</PillButton>
+                {!wide && <PillButton onClick={() => selectTab('projects')}>{copy.home.more}</PillButton>}
               </div>
             </div>
           ) : (
             <>
               {/* Compact identity header, tap to return to the main screen */}
-              <div className="mt-6 flex md:mt-8 md:justify-center">
+              <div className="mt-6 flex md:mt-10 md:justify-center">
                 <button
                   type="button"
                   onClick={() => selectTab('home')}
@@ -253,7 +266,7 @@ export const BeaconPage: React.FC = () => {
                     alt=""
                     width={48}
                     height={48}
-                    className="h-12 w-12 shrink-0 rounded-full border-2 border-white/80 object-cover object-[50%_30%] md:h-14 md:w-14"
+                    className="h-12 w-12 shrink-0 rounded-full border-2 border-white/80 object-cover object-[50%_30%]"
                   />
                   <span className="min-w-0">
                     <span className="block font-display text-base font-bold leading-tight md:text-lg">James Valentino Rojas Díaz</span>
@@ -262,51 +275,14 @@ export const BeaconPage: React.FC = () => {
                 </button>
               </div>
 
-              {/* Centered pill bar; the five tabs fit on a phone, and it only scrolls on very narrow screens */}
-              <div className="sticky top-3 z-20 mt-5 flex justify-center md:mt-6">
-                <div
-                  role="tablist"
-                  aria-label="Secciones"
-                  className={`inline-flex max-w-full gap-0.5 overflow-x-auto rounded-full p-1 [scrollbar-width:none] ${glass}`}
-                >
-                  {TAB_IDS.map((id) => {
-                    const active = tab === id;
-                    return (
-                      <button
-                        key={id}
-                        type="button"
-                        role="tab"
-                        id={`tab-${id}`}
-                        aria-selected={active}
-                        aria-controls={`panel-${id}`}
-                        onClick={(e) => {
-                          selectTab(id);
-                          e.currentTarget.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
-                        }}
-                        className={`min-h-10 shrink-0 rounded-full px-2.5 text-[11px] font-semibold whitespace-nowrap transition-colors cursor-pointer max-[360px]:px-1.5 max-[360px]:text-[10.5px] sm:px-3.5 sm:text-xs md:px-6 md:text-sm ${
-                          active ? 'bg-white text-slate-950' : 'text-white/70 hover:text-white'
-                        }`}
-                      >
-                        {copy.tabs[id]}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+              {/* Phones: centered pill bar under the header, pinned while scrolling */}
+              {!wide && <div className="sticky top-3 z-20 mt-5 flex justify-center">{tabBar}</div>}
 
               <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className="mt-5 md:mt-8">
-                {tab === 'links' && (
-                  <div className="mx-auto grid max-w-3xl gap-3 md:grid-cols-2 md:gap-4">
-                    {mainLinks.map((link, idx) => (
-                      <LinkCard key={link.id} link={link} lang={lang} href={hrefFor(link)} index={idx} />
-                    ))}
-                  </div>
-                )}
-
                 {tab === 'projects' && (
                   <div className="grid gap-4 md:grid-cols-3 md:gap-5">
-                    {projectLinks.map((link, idx) => (
-                      <ProjectCard key={link.id} link={link} lang={lang} index={idx} />
+                    {beaconProjects.map((project, idx) => (
+                      <ProjectCard key={project.id} project={project} lang={lang} index={idx} />
                     ))}
                   </div>
                 )}
@@ -329,9 +305,11 @@ export const BeaconPage: React.FC = () => {
                 {tab === 'stack' && <TechRows />}
               </div>
 
-              <PillButton onClick={() => selectTab(nextTab ?? 'home')}>
-                {nextTab ? `${copy.next}: ${copy.tabs[nextTab]}` : copy.backHome}
-              </PillButton>
+              {!wide && (
+                <PillButton onClick={() => selectTab(nextTab ?? 'home')}>
+                  {nextTab ? `${copy.next}: ${copy.tabs[nextTab]}` : copy.backHome}
+                </PillButton>
+              )}
             </>
           )}
         </div>
