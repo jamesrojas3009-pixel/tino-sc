@@ -1,0 +1,3 @@
+{
+  "rewrites": [{ "source": "/beacon", "destination": "/index.html" }]
+}
